@@ -1,0 +1,140 @@
+vlb:
+  ftp:
+    host: ftp.vlb.de
+    user: ftp5263911
+    password: xxxxxxxxx
+    path: /public/onix30/tagesexport/
+  zip:
+    nameformat: 'VLBOnix30_[date].zip'
+  file:
+    patternWithActionGroup: '[0-9]{8}_VLBOnix30_(\w{3}).xml'
+    prefix:
+      new: 'New'
+      delete: 'Del'
+      update: 'Upd'
+  product:
+    blacklist:
+      - $.descriptiveDetail.languages[?(@.languageCodeValue == 'English')]
+    whitelist:
+    mapper:
+      languageIsoCode:
+        'Mandarin Chinese': 'chi'
+        'Russisch': 'rus'
+        'de': 'ger'
+        'Catalan': 'cat'
+        'French': 'fre'
+        'Serbian': 'srp'
+        'Dänisch': 'dan'
+        'Français': 'fre'
+        'Dutch': 'dut'
+        'Französisch': 'fre'
+        'Portuguese': 'por'
+        'Néerlandais': 'dut'
+        'Japanisch': 'jpn'
+        'Englisch': 'eng'
+        'Arabic': 'ara'
+        'Portuguese Brazilian': 'por'
+        'Japanese': 'jpn'
+        'Danish': 'dan'
+        'Latein': 'lat'
+        'English': 'eng'
+        'Finnish': 'fin'
+        'Multilingue': 'mul'
+        'Multilingual': 'mul'
+        'Spanish': 'spa'
+        'Czech': 'cze'
+        'Polish': 'pol'
+        'Türkisch': 'tur'
+        'Italian': 'ita'
+        'Russian': 'rus'
+        'Hungarian': 'hun'
+        'Hebräisch': 'heb'
+        'German': 'ger'
+        'Chinese': 'chi'
+        'Russe': 'rus'
+        'Allemand': 'ger'
+        'Deutsch': 'ger'
+        'Norwegisch': 'nor'
+        'Spanisch': 'spa'
+        'Griechisch': 'gre'
+        'Greek': 'gre'
+        'Finnisch': 'fin'
+        'Italienisch': 'ita'
+        'Unknown': ''
+        'Hausa': 'hau'
+        'Adygeisch': 'ady'
+        'Italien': 'ita'
+        'Anglais': 'eng'
+        'Polnisch': 'pol'
+        'us': 'eng'
+        'Mandarin': 'chi'
+        'Tschechisch': 'cze'
+        'Afrikaans': 'afr'
+        'Portugiesisch': 'por'
+        'Niederländisch': 'dut'
+        'Serbisch': 'srp'
+        'Albanian': 'alb'
+        'Romanian': 'rum'
+        'Hindi': 'hin'
+        'Croatian': 'hrv'
+        'Japonais': 'jpn'
+        'Koreanisch': 'kor'
+        'Welsh': 'wel'
+        'Espagnol': 'spa'
+        'Norwegian': 'nor'
+        'Korean': 'kor'
+        'Schwedisch': 'swe'
+        'Katalanisch': 'cat'
+        'Chinesisch': 'chi'
+        'Lithuanian': 'lit'
+        'Swedish': 'swe'
+        'Turkish': 'tur'
+    map:
+      # see https://github.com/json-path/JsonPath
+      title: $.descriptiveDetail.titleDetails[0].titleElements[0].titleText.value
+      subTitle: $.descriptiveDetail.titleDetails[?(@.titleTypeValue == 'Distinctive_title_book')].titleElements[?(@.titleElementLevelValue == 'Product')].subTitleValue
+      isbn10: $.productIdentifiers[?(@.productIDType.value == 'ISBN_10')].idValue.value
+      isbn13: $.productIdentifiers[?(@.productIDType.value == 'ISBN_13')].idValue.value
+      medium: $.descriptiveDetail.productFormDescriptions[0].value
+      languageIsoCode: $.descriptiveDetail.languages[?(@.languageRoleValue == 'Language_of_text')].languageCodeValue
+      pageCount: $.descriptiveDetail.extents[?(@.extentTypeValue in ['Main_content_page_count', 'Content_page_count'])].extentValueValue
+      description: $.collateralDetail.textContents[?(@.textTypeValue == 'Description')].textValues[0]
+      authors.name: $.descriptiveDetail.contributors[*].personNameValue
+
+---
+
+spring:
+  profiles: default, dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lb3
+    username: lb3
+    password: xxxxxxxxx
+  jpa.hibernate.ddl-auto: create
+logging.level:
+  de.lovelybooks.etl: DEBUG
+
+---
+
+spring:
+  profiles: docker-staging
+  datasource:
+    url: jdbc:postgresql://99.99.99.99:5432/lb3
+    username: lb3
+    password: xxxxxxxxxx
+  jpa.hibernate.ddl-auto: validate
+logging.level:
+  de.lovelybooks.etl: WARN
+  
+---
+
+spring:
+  profiles: docker-prod
+  datasource:
+    url: jdbc:postgresql://10.0.0.6:5432/lb3
+    username: lb3
+    password: xxxxxxxxxxxxx
+  jpa.hibernate.ddl-auto: validate
+logging.level:
+  de.lovelybooks.etl: ERROR
+  
+  
